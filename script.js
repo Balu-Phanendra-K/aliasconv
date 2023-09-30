@@ -1,21 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
     const htmlInput = document.getElementById("htmlInput");
     const convertButton = document.getElementById("convertButton");
-    const resultDiv = document.getElementById("result");
+    const output = document.getElementById("output");
 
     convertButton.addEventListener("click", function () {
         const inputHtml = htmlInput.value;
         const convertedHtml = convertAliases(inputHtml);
-        resultDiv.innerText = convertedHtml;
+        output.value = convertedHtml; // Set the value of the textarea
     });
 
     function convertAliases(inputHtml) {
-        // Use regular expressions to replace spaces, hyphens, and special characters with underscores
-        const convertedHtml = inputHtml.replace(/alias="([^"]+)"/g, function (match, alias) {
-            const convertedAlias = alias.replace(/[\s\-._]+/g, "_");
-            return `alias="${convertedAlias}"`;
+        const lines = inputHtml.split('\n');
+        const convertedLines = lines.map(line => {
+            const match = line.match(/alias="(.*?)"/);
+            if (match) {
+                const alias = match[1];
+                const convertedAlias = alias.trim().replace(/[ -./\\]/g, '_');
+                return line.replace(alias, convertedAlias);
+            }
+            return line;
         });
-
-        return convertedHtml;
+        return convertedLines.join('\n');
     }
 });
